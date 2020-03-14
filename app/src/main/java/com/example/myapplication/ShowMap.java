@@ -23,8 +23,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 public class ShowMap extends AppCompatActivity {
 
     ImageView map;
-//ZoomControls zoomIt;
-TextView  imgSize ;
+Button loadanchor;
     private static final int[] FROM_COLOR = new int[]{255, 255, 255};
     private static final int THRESHOLD = 100;
     @Override
@@ -37,27 +36,30 @@ TextView  imgSize ;
         setContentView(R.layout.activity_show_map);
 
         map = (ImageView) findViewById(R.id.map);
-        imgSize = (TextView) findViewById(R.id.bitmapp);
-
+        loadanchor = (Button)findViewById(R.id.loadanchor);
+        loadanchor.setVisibility(View.INVISIBLE);
 
         map.setOnTouchListener(new View.OnTouchListener()
 
         {
+
             @Override
             public boolean onTouch (View view, MotionEvent event){
+                loadanchor.setVisibility(View.VISIBLE);
+
                 Drawable d = getResources().getDrawable(R.drawable.map1);
 
                 float eventX = event.getRawX();
                 float eventY = event.getRawY();
                 float[] eventXY = new float[]{eventX, eventY};
-
                 Matrix invertMatrix = new Matrix();
                 ((ImageView) view).getImageMatrix().invert(invertMatrix);
 
                 invertMatrix.mapPoints(eventXY);
                 int x = Integer.valueOf((int) eventXY[0]);
                 int y = Integer.valueOf((int) eventXY[1]);
-                map.setImageDrawable(adjust(d));
+
+                map.setImageDrawable(adjust(d,x,y));
 
                 Toast.makeText(ShowMap.this, "touched position: "
                         + String.valueOf(x) + " , "
@@ -69,7 +71,7 @@ TextView  imgSize ;
         });
     }
 
-    private Drawable adjust(Drawable d) {
+    private Drawable adjust(Drawable d , int x1 ,int y1) {
         int to = Color.RED;
 
         //Need to copy to ensure that the bitmap is mutable.
@@ -78,8 +80,8 @@ TextView  imgSize ;
         Bitmap bitmap = src.copy(Bitmap.Config.ARGB_8888, true);
         bitmap = Bitmap.createScaledBitmap(bitmap,1080, 1857, true);
 
-        for(int x = 530;x < 1075;x++)
-            for(int y = 0;y < 513;y++)
+        for(int x = x1;x < x1+10;x++)
+            for(int y = y1;y < y1+10;y++)
                 if(match(bitmap.getPixel(x, y)))
                     bitmap.setPixel(x, y, to);
 
